@@ -1,0 +1,37 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      
+    - name: Publish
+      if: github.ref == 'refs/heads/main'
+      run: dotnet publish src/WaterPermitManager.API/WaterPermitManager.API.csproj -c Release -o publish
+
+    # Add deployment steps here when ready for production
+    # - name: Deploy
+    #   if: github.ref == 'refs/heads/main'
+    #   # Add deployment configuration 
