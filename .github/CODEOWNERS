@@ -1,0 +1,23 @@
+# These owners will be the default owners for everything in the repo
+* @Vexatious-777
+
+# API Controllers
+/src/WaterPermitManager.API/Controllers/ @Vexatious-777
+
+# Core Domain Models
+/src/WaterPermitManager.Core/ @Vexatious-777
+
+# Infrastructure and Data Access
+/src/WaterPermitManager.Infrastructure/ @Vexatious-777
+
+# Application Services
+/src/WaterPermitManager.Application/ @Vexatious-777
+
+# Tests
+/tests/ @Vexatious-777
+
+# GitHub Actions workflows
+/.github/workflows/ @Vexatious-777
+
+# Database migrations
+/src/WaterPermitManager.Infrastructure/Migrations/ @Vexatious-777 

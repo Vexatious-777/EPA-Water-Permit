@@ -1,37 +1,109 @@
-name: .NET CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  CONFIGURATION: 'Release'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  build:
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    
+      with:
+        fetch-depth: 0
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'
-        
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Restore dependencies
       run: dotnet restore
-      
+
+    - name: Check code format
+      run: |
+        dotnet format --verify-no-changes || (echo "Code format check failed. Run 'dotnet format' locally to fix." && exit 1)
+
+  build:
+    needs: validate
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
     - name: Build
-      run: dotnet build --no-restore --configuration Release
-      
-    - name: Test
-      run: dotnet test --no-build --configuration Release --verbosity normal
-      
+      run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
+    - name: Run unit tests
+      run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./coverage
+
+  security:
+    needs: build
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run security scan
+      uses: snyk/actions/dotnet@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+  deploy:
+    needs: [build, security]
+    name: Deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency: production_environment
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
     - name: Publish
-      if: github.ref == 'refs/heads/main'
-      run: dotnet publish src/WaterPermitManager.API/WaterPermitManager.API.csproj -c Release -o publish
+      run: dotnet publish src/WaterPermitManager.API/WaterPermitManager.API.csproj -c ${{ env.CONFIGURATION }} -o publish
 
     # Add deployment steps here when ready for production
-    # - name: Deploy
-    #   if: github.ref == 'refs/heads/main'
-    #   # Add deployment configuration 
+    # - name: Deploy to Azure
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+    #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    #     package: ./publish 

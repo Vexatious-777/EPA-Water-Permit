@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # NuGet dependencies
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 10
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "nuget"
+    reviewers:
+      - "Vexatious-777"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      microsoft-packages:
+        patterns:
+          - "Microsoft.*"
+      test-packages:
+        patterns:
+          - "xunit*"
+          - "Moq*"
+          - "FluentAssertions*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "Vexatious-777"
+    commit-message:
+      prefix: "ci"
+      include: "scope" 
