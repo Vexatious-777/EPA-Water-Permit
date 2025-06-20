@@ -1,4 +1,4 @@
-# Water Permit Manager
+# EPA Water Permit Manager
 
 A .NET Core application for managing water permits and EPA submissions.
 
@@ -33,12 +33,12 @@ The solution follows Clean Architecture principles:
 
 1. Clone the repository
 ```bash
-git clone [repository-url]
+git clone https://github.com/Vexatious-777/EPA-Water-Permit.git
 ```
 
 2. Navigate to the project directory
 ```bash
-cd WaterPermitManager
+cd EPA-Water-Permit
 ```
 
 3. Restore dependencies
@@ -83,4 +83,4 @@ The application uses SQL Server with the following main entities:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. # EPA-Water-Permit
+This project is licensed under the MIT License - see the LICENSE file for details.
