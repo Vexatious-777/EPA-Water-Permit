@@ -63,16 +63,22 @@ The API will be available at:
 
 ## API Endpoints
 
+- POST /api/Auth/register - Register page for users
+- POST /api/Auth/login - login page for users
 - GET /api/WaterPermits - List all permits
+- POST /api/WaterPermits - submit a permit to database
+- GET /api/WaterPermits/search - search page
 - GET /api/WaterPermits/{id} - Get specific permit
-- POST /api/WaterPermits - Create new permit
+- PUT /api/WaterPermits/{id} - to update a permit
+- DELETE /api/WaterPermits/{id} - to delete a permit
 
 ## Database Schema
 
 The application uses SQL Server with the following main entities:
 
-- WaterPermit
-- PermitParameter
+- LoginRequest
+- RegisterRequest
+- WaterPermitDto
 
 ## Contributing
 
