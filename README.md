@@ -1,4 +1,4 @@
-# EPA Water Permit Manager
+# Mock EPA Water Permit Manager for Washington State job application
 
 A .NET Core application for managing water permits and EPA submissions.
 
